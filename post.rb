@@ -1,5 +1,13 @@
 class Post
 
+  def self.post_types #Объявление статического метода
+    [Memo, Link, Task]
+  end
+
+  def self.create(type_index)
+    return post_types[type_index].new
+  end
+
   def initialize
     @created_at = Time.now
     @text = nil
@@ -9,7 +17,7 @@ class Post
     #to do
   end
 
-  def to_strings    #�����頥� ᮤ�ন��� ��ꥪ� � ���� ���ᨢ� ��ப
+  def to_strings    #Возвращает содержимое объекта в виде массива строк
     #to do
   end
 
@@ -23,7 +31,7 @@ class Post
     file.close
   end
 
-  def file_path  #����뢠�� ���� � 䠩��, �㤠 �����뢠���� ��ꥪ�
+  def file_path  #Указывает путь к файлу, куда записывается объект
     current_path = File.dirname(__FILE__)
 
     file_name = @created_at.strftime("#{self.class.name}_%Y-%m-%d_%H-%M-%S.txt")
