@@ -12,7 +12,10 @@ require_relative 'task.rb'
 require_relative 'memo.rb'
 require_relative 'link.rb'
 
-choices = Post.post_types
+puts "Блокнот. Версия 2. SQLite"
+puts "Что хотите записать?"
+
+choices = Post.post_types.keys
 
 choice = -1
 
@@ -25,9 +28,10 @@ while ((choice < 0) or (choice >= choices.size))
   choice = STDIN.gets.chomp.to_i - 1
 end
 
-entry = Post.create(choice)
+entry = Post.create(choices[choice])
 
 entry.read_from_console
 entry.save
+id = entry.save_to_db
 
-puts "Запись сохранена."
+puts "Запись сохранена. id: #{id}"
