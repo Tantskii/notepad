@@ -31,4 +31,11 @@ class Link < Post
     )
   end
 
+  # загружаем свои поля из хэш массива
+  def load_data(data_hash)
+    super(data_hash) # сперва дергаем родительский метод для общих полей
+
+    # теперь прописываем свое специфичное поле
+    @url = data_hash['url']
+  end
 end
