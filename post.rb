@@ -76,62 +76,64 @@ class Post
     }
   end
 
-  # Находит в базе запись по идентификатору или массив записей
-  # из базы данных, который можно например показать в виде таблицы на экране
-  def self.find(limit, type, id) #осуществляет поиск по БД
+  #Осуществляет поиск с учетом параметров (тип поста и количество)
+  def self.find_all(limit, type)
     db = SQLite3::Database.open(@@SQLITE_DB_FILE)
 
-    if id != nil
-      db.results_as_hash = true #Возвращает массив ассоциативных массивов
-                                #Где ключи - названия столбцов в бд
+    #Вернем таблицу записей
 
-      result = db.execute("SELECT * FROM posts WHERE  rowid = ?", id)
+    db.results_as_hash = false #Вернет массив массивов
 
-      if result.is_a? Array
-        result = result[0]
-      end
+    # формируем запрос в базу с нужными условиями
+    query = "SELECT rowid, * FROM posts " #В результате вернется массив на первом месте будет
+    #идентификатор записи(rowid), наверно есть проблемы с порядком
+    #при передаче из бд в руби
 
-      db.close
+    query += "WHERE type = :type " unless type == nil
+    query += "ORDER by rowid DESC " # сортировка, самые свежие в начале
 
-      if result.nil?
-        puts "Такой id #{id} не найден в базе"
-        return nil
-      else
-        post = create(result['type'])
-        post.load_data(result)
+    query += "LIMIT :limit " unless limit.nil? # если задан лимит, надо добавить условие
 
-        return post
-      end
+    statement = db.prepare(query) #Готовим запрос в бд, метод prepare этим и занимается
 
+    #Вствим вместо плейсхолдеров (:type, :limit) значения
+    statement.bind_param('type', type) unless type == nil
+    statement.bind_param('limit', limit) unless limit == nil
+
+    result = statement.execute! # Вернется массив состоящий из элементов бд
+    # Каждый элемент массива - массив, где элементы это столбцы в бд
+    # rowid, type, created_att, text, url, due_date
+
+    statement.close
+    db.close
+
+    return result
+  end
+
+  #Осуществляет поиск по заданному id
+  def self.find_by_id(id)
+    db = SQLite3::Database.open(@@SQLITE_DB_FILE)
+
+    db.results_as_hash = true #Возвращает массив ассоциативных массивов
+    #Где ключи - названия столбцов в бд
+
+    result = db.execute("SELECT * FROM posts WHERE  rowid = ?", id)
+
+    if result.is_a? Array
+      result = result[0]
+    end
+
+    db.close
+
+    if result.nil?
+      puts "Такой id #{id} не найден в базе"
+      return nil
     else
-      #Вернем таблицу записей
+      post = create(result['type'])
+      post.load_data(result)
 
-      db.results_as_hash = false #Вернет массив массивов
-
-      # формируем запрос в базу с нужными условиями
-      query = "SELECT rowid, * FROM posts "  #В результате вернется массив на первом месте будет
-                                             #идентификатор записи(rowid), наверно есть проблемы с порядком
-                                              #при передаче из бд в руби
-
-      query += "WHERE type = :type " unless type == nil
-      query += "ORDER by rowid DESC " # сортировка, самые свежие в начале
-
-      query += "LIMIT :limit " unless limit.nil? # если задан лимит, надо добавить условие
-
-      statement = db.prepare(query) #Готовим запрос в бд, метод prepare этим и занимается
-
-      #Вствим вместо плейсхолдеров (:type, :limit) значения
-      statement.bind_param('type', type) unless type == nil
-      statement.bind_param('limit', limit) unless limit == nil
-
-      result = statement.execute! # Вернется массив состоящий из элементов бд
-                                  # Каждый элемент массива - массив, где элементы это столбцы в бд
-                                  # rowid, type, created_att, text, url, due_date
-
-      statement.close
-      db.close
-
-      return result
+      return post
     end
   end
+  
 end

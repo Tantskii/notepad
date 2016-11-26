@@ -12,7 +12,7 @@ require_relative 'task.rb'
 require_relative 'memo.rb'
 require_relative 'link.rb'
 
-puts "Блокнот. Версия 2. SQLite"
+puts "Блокнот. Версия 2.1 SQLite"
 puts "Что хотите записать?"
 
 choices = Post.post_types.keys
