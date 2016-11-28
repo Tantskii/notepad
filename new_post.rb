@@ -11,6 +11,7 @@ require_relative 'post.rb'
 require_relative 'task.rb'
 require_relative 'memo.rb'
 require_relative 'link.rb'
+require_relative 'tweet.rb'
 
 puts "Блокнот. Версия 2.1 SQLite"
 puts "Что хотите записать?"
@@ -31,7 +32,7 @@ end
 entry = Post.create(choices[choice])
 
 entry.read_from_console
-entry.save
+#entry.save
 id = entry.save_to_db
 
 puts "Запись сохранена. id: #{id}"

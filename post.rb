@@ -5,7 +5,7 @@ class Post
   @@SQLITE_DB_FILE = 'notepad.sqlite'
 
   def self.post_types #Объявление статического метода
-    {'Memo' => Memo, 'Link' => Link, 'Task' => Task}
+    {'Memo' => Memo, 'Link' => Link, 'Task' => Task, 'Tweet' => Tweet}
   end
 
   def self.create(types)
@@ -135,5 +135,5 @@ class Post
       return post
     end
   end
-  
+
 end
